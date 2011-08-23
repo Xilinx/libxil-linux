@@ -1,0 +1,5 @@
+This is a free replacement of the xil library distributed with the
+Xilinx tools.
+
+It is useful when testing bare-metal microblaze toolchains on linux
+systems.
