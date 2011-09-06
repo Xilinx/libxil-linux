@@ -9,7 +9,7 @@ CC = $(CROSS)gcc
 LD = $(CC)
 AR = $(CROSS)ar
 
-CFLAGS += -O2 -Wall
+CFLAGS += -O2 -Wall -g -Wl,--no-relax
 
 OBJS += xil.o
 OBJS += xil-sbrk.o

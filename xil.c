@@ -158,5 +158,6 @@ int unlink(const char *name)
 
 __attribute__ ((constructor))
 void __init_xil(void) {
+	__init_xil_sbrk();
 	__init_xil_signals();
 }

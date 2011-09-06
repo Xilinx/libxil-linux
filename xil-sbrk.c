@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 extern char _end[];
-static void *curbrk = _end;
+static void *curbrk;
 
 extern void *_brk(void *addr);
 
@@ -33,16 +33,23 @@ int brk(void *addr)
 
 void *_sbrk(intptr_t increment)
 {
-        void *prevbrk = curbrk;
+        unsigned char *prevbrk = curbrk;
+	int err;
 
-        if (brk(prevbrk + increment) == -1) {
-                return  (void *) -1;
+        err = brk(prevbrk + increment);
+        if (err == -1) {
+		return (void *) - 1;
 	}
 
-        return prevbrk;
+	return prevbrk;
 }
 
 void *sbrk(intptr_t increment)
 {
 	return _sbrk(increment);
+}
+
+void __init_xil_sbrk(void)
+{
+	curbrk = _brk(0);
 }
