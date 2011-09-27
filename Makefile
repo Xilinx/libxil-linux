@@ -3,7 +3,7 @@
 # GPLv2
 #
 
-CROSS=microblaze-unknown-elf-
+CROSS?=microblaze-unknown-elf-
 
 CC = $(CROSS)gcc
 LD = $(CC)
