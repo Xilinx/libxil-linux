@@ -116,9 +116,82 @@ int open _PARAMS ((const char *pathname, int flags, ...))
 	return _set_errno(_open(pathname, linux_flags, mode));
 }
 
+typedef int int32_t;
+typedef unsigned int uint32_t;
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+struct target_stat64 {
+        uint64_t st_dev;
+#define TARGET_STAT64_HAS_BROKEN_ST_INO 1
+        uint32_t pad0;
+        uint32_t __st_ino;
+
+        uint32_t st_mode;
+        uint32_t st_nlink;
+        uint32_t st_uid;
+        uint32_t st_gid;
+        uint64_t st_rdev;
+        uint64_t __pad1;
+
+        int64_t  st_size;
+        int32_t  st_blksize;
+        uint32_t __pad2;
+        int64_t st_blocks;      /* Number 512-byte blocks allocated. */
+
+        int            st_atime;
+        unsigned int   st_atime_nsec;
+        int            st_mtime;
+        unsigned int   st_mtime_nsec;
+        int            st_ctime;
+        unsigned int   st_ctime_nsec;
+        uint64_t st_ino;
+};
+
+struct target_stat {
+        unsigned long st_dev;
+        unsigned long st_ino;
+        unsigned int st_mode;
+        unsigned short st_nlink;
+        unsigned int st_uid;
+        unsigned int st_gid;
+        unsigned long  st_rdev;
+        unsigned long  st_size;
+        unsigned long  st_blksize;
+        unsigned long  st_blocks;
+        unsigned long  st_atime;
+        unsigned long  st_atime_nsec;
+        unsigned long  st_mtime;
+        unsigned long  st_mtime_nsec;
+        unsigned long  st_ctime;
+        unsigned long  st_ctime_nsec;
+        unsigned long  __unused4;
+        unsigned long  __unused5;
+};
+
+#define statcopy(a, b, f) ((a)->f = (b)->f)
+
 int fstat(int fd, struct stat *buf)
 {
-	return _set_errno(_fstat(fd, buf));
+	struct target_stat64 tstat, *ts = &tstat;
+	int lerr;
+
+	lerr = _fstat(fd, (struct stat *) &tstat);
+
+	statcopy(buf, ts, st_dev);
+	statcopy(buf, ts, st_ino);
+	statcopy(buf, ts, st_mode);
+	statcopy(buf, ts, st_nlink);
+	statcopy(buf, ts, st_uid);
+	statcopy(buf, ts, st_gid);
+	statcopy(buf, ts, st_rdev);
+	statcopy(buf, ts, st_size);
+	statcopy(buf, ts, st_blksize);
+	statcopy(buf, ts, st_blocks);
+	statcopy(buf, ts, st_atime);
+	statcopy(buf, ts, st_mtime);
+	statcopy(buf, ts, st_ctime);
+
+	return _set_errno(lerr);
 }
 
 ssize_t write(int fd, const void *buf, size_t count)
